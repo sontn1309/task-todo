@@ -1,0 +1,24 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "updateTodo",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "pattern": "^(?!\\s*$).+"
+    },
+    "dueDate": {
+      "type": "string",
+      "pattern": "^(?!\\s*$).+"
+    },
+    "done": {
+      "type": "boolean"
+    }
+  },
+  "required": [
+    "name",
+    "dueDate",
+    "done"
+  ],
+  "additionalProperties": false
+}
