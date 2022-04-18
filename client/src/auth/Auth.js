@@ -1,5 +1,6 @@
 import auth0 from 'auth0-js';
-import { authConfig } from '../config';
+import { originUrl, authConfig } from '../config';
+import Swal from 'sweetalert2'
 
 export default class Auth {
   accessToken;
@@ -27,19 +28,19 @@ export default class Auth {
   }
 
   login() {
-    this.auth0.authorize();
+    this.auth0.authorize()
   }
 
   handleAuthentication() {
     this.auth0.parseHash((err, authResult) => {
       if (authResult && authResult.accessToken && authResult.idToken) {
-        console.log('Access token: ', authResult.accessToken)
-        console.log('id token: ', authResult.idToken)
         this.setSession(authResult);
       } else if (err) {
-        this.history.replace('/');
         console.log(err);
-        alert(`Error: ${err.error}. Check the console for further details.`);
+        Swal.fire({
+          icon: 'error',
+          text: 'Error: Check the console for further details.',
+        })
       }
     });
   }
@@ -49,32 +50,44 @@ export default class Auth {
   }
 
   getIdToken() {
-    return this.idToken;
+    try {
+      if (!sessionStorage.getItem('id_token')) {
+        this.login();
+      }
+      return String(sessionStorage.getItem('id_token'));
+    } catch (error) {
+      console.log(error);
+      return "";
+    }
   }
 
   setSession(authResult) {
     // Set isLoggedIn flag in localStorage
-    localStorage.setItem('isLoggedIn', 'true');
-
+    sessionStorage.setItem('is_loggedIn', 'true');
     // Set the time that the access token will expire at
     let expiresAt = (authResult.expiresIn * 1000) + new Date().getTime();
     this.accessToken = authResult.accessToken;
     this.idToken = authResult.idToken;
     this.expiresAt = expiresAt;
-
+    sessionStorage.setItem("id_token", authResult.idToken);
+    sessionStorage.setItem("expires_at", expiresAt);
+    sessionStorage.setItem("access_token", authResult.accessToken);
     // navigate to the home route
     this.history.replace('/');
   }
 
   renewSession() {
     this.auth0.checkSession({}, (err, authResult) => {
-       if (authResult && authResult.accessToken && authResult.idToken) {
-         this.setSession(authResult);
-       } else if (err) {
-         this.logout();
-         console.log(err);
-         alert(`Could not get a new token (${err.error}: ${err.error_description}).`);
-       }
+      if (authResult && authResult.accessToken && authResult.idToken) {
+        this.setSession(authResult);
+      } else if (err) {
+        this.logout();
+        console.log(err);
+        Swal.fire({
+          icon: 'error',
+          text: `Could not get a new token (${err.error}: ${err.error_description}).`,
+        })
+      }
     });
   }
 
@@ -83,12 +96,10 @@ export default class Auth {
     this.accessToken = null;
     this.idToken = null;
     this.expiresAt = 0;
-
-    // Remove isLoggedIn flag from localStorage
-    localStorage.removeItem('isLoggedIn');
-
+    sessionStorage.setItem('is_loggedIn', 'false');
+    sessionStorage.removeItem("id_token");
     this.auth0.logout({
-      return_to: window.location.origin
+      return_to: originUrl
     });
 
     // navigate to the home route
@@ -96,9 +107,16 @@ export default class Auth {
   }
 
   isAuthenticated() {
-    // Check whether the current time is past the
-    // access token's expiry time
-    let expiresAt = this.expiresAt;
-    return new Date().getTime() < expiresAt;
+    try {
+      let expiresAt = parseInt(sessionStorage.getItem("expires_at"));
+      if (!sessionStorage.getItem("id_token")) {
+        return false;
+      }
+      return new Date().getTime() < expiresAt;
+    } catch (error) {
+      console.log(error);
+      return false;
+    }
+
   }
 }
