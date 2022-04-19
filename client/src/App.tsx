@@ -4,10 +4,13 @@ import { Grid, Segment } from 'semantic-ui-react'
 
 import Auth from './auth/Auth'
 import { EditTodo } from './components/EditTodo'
+import { Carousel } from './components/Carousel'
+import { TaskList } from './components/tabList/TaskList'
 import { NotFound } from './components/NotFound'
 import { Todos } from './components/Todos'
 import { Headder } from './components/Headder'
-import 'bootstrap/dist/css/bootstrap.min.css';
+import { Footer } from './components/Footer'
+import 'mdb-react-ui-kit/dist/css/mdb.min.css'
 
 export interface AppProps { }
 
@@ -25,14 +28,14 @@ export default class App extends Component<AppProps, AppState> {
   render() {
     return (
       <div>
-        <Segment style={{ padding: '0em 0em 5em 0em' }} vertical>
+        <Segment style={{ padding: '0em 0em 12em 0em'}} vertical>
           <Router history={this.props.history}>
             <Route
               render={props => {
                 return <Headder auth={this.props.auth}  {...props}/>
               }}
             />
-            <Grid container stackable verticalAlign="middle" style={{ padding: '3em 0em 3em 0em' }}>
+            <Grid container stackable verticalAlign="middle" style={{ padding: '3em 0em 3em 0em'}}>
               <Grid.Row>
                 <Grid.Column width={16}>
                   {this.generateCurrentPage()}
@@ -41,13 +44,13 @@ export default class App extends Component<AppProps, AppState> {
             </Grid>
           </Router>
         </Segment>
+        <Footer></Footer>
       </div>
     )
   }
   generateCurrentPage() {
-    console.log("1")
     if (!this.props.auth.isAuthenticated()) {
-      return <Grid.Column width={16}></Grid.Column>
+      return <Carousel />
     }
     return (
       <Switch>
@@ -55,7 +58,7 @@ export default class App extends Component<AppProps, AppState> {
           path="/"
           exact
           render={props => {
-            return <Todos {...props} auth={this.props.auth} />
+            return <TaskList />
           }}
         />
 

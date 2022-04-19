@@ -9,6 +9,23 @@ import {
   Container,
   Dropdown
 } from 'react-bootstrap'
+import {
+  MDBContainer,
+  MDBNavbar,
+  MDBNavbarBrand,
+  MDBNavbarToggler,
+  MDBIcon,
+  MDBNavbarNav,
+  MDBNavbarItem,
+  MDBNavbarLink,
+  MDBBtn,
+  MDBDropdown,
+  MDBDropdownToggle,
+  MDBDropdownMenu,
+  MDBDropdownItem,
+  MDBDropdownLink,
+  MDBCollapse
+} from 'mdb-react-ui-kit';
 
 export interface LogInProps {
   auth: Auth
@@ -77,23 +94,24 @@ export class Headder extends React.PureComponent<LogInProps, LogInState> {
       return (
 
         <Nav className="me-auto justify-content-md-left">
-          <Navbar.Brand style={{ padding: '0.5em 8em 1em 0em' }} onClick={() => this.backHome()}><BsFillAlarmFill /></Navbar.Brand>
-          <Nav.Link  onClick={() => this.backHome()}  style={{ padding: '1em 8em 0em 0em' }} >Home</Nav.Link>
-          <Nav.Link style={{ padding: '1em 8em 0em 0em' }} onClick={() => this.backHome()}>New</Nav.Link>
-          <Nav.Link style={{ padding: '1em 8em 0em 0em' }} onClick={() => this.backHome()}>All task</Nav.Link>
-          <Dropdown style={{ padding: '0.5em 8em 0.5em 0.5em' }}>
-            <Dropdown.Toggle  id="dropdown-button-user" variant="secondary" >
-            <Navbar.Brand style={{ padding: '0.5em 0em 1em 0em' }}> <BsFillPersonLinesFill /></Navbar.Brand>  Hello Button 
-            </Dropdown.Toggle>
-
-            <Dropdown.Menu variant="light">
-              <Dropdown.Item  onClick={() => this.userInformationClick()} active>
-                User information
-              </Dropdown.Item>
-              <Dropdown.Divider />
-              <Dropdown.Item href="#/action-4" onClick={this.handleLogout}>Sign out</Dropdown.Item>
-            </Dropdown.Menu>
-          </Dropdown>
+          <Navbar.Brand style={{ padding: '0.75em 8em 1em 0em' }} onClick={() => this.backHome()}><BsFillAlarmFill /></Navbar.Brand>
+          <Nav.Link  onClick={() => this.backHome()}  style={{ padding: '0.75em 8em 0.5em 0em' }} >Home</Nav.Link>
+          <Nav.Link style={{ padding: '0.75em 8em 0.5em 0em' }} onClick={() => this.backHome()}>All task</Nav.Link>
+          <MDBNavbarItem>
+              <MDBDropdown >
+                <MDBDropdownToggle tag='a' className='nav-link' style={{ padding: '0.75em 8em 0.5em 0.5em' }}>
+                <BsFillPersonLinesFill/>
+                </MDBDropdownToggle>
+                <MDBDropdownMenu>
+                  <MDBDropdownItem>
+                    <MDBDropdownLink onClick={() => this.userInformationClick()}>User information</MDBDropdownLink>
+                  </MDBDropdownItem>
+                  <MDBDropdownItem>
+                    <MDBDropdownLink onClick={this.handleLogout}>Sign out</MDBDropdownLink>
+                  </MDBDropdownItem>
+                </MDBDropdownMenu>
+              </MDBDropdown>
+            </MDBNavbarItem>
         </Nav>
       )
     } else {
