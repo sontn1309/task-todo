@@ -1,7 +1,5 @@
 import dateFormat from 'dateformat'
 import { History } from 'history'
-import update from 'immutability-helper'
-import Swal from 'sweetalert2'
 import * as React from 'react'
 import {
   Button,
@@ -15,7 +13,7 @@ import {
   Loader
 } from 'semantic-ui-react'
 
-import { createTodo, deleteTodo, getTodos, patchTodo } from '../api/todos-api'
+// import { createTodo, deleteTodo, getTodos, patchTodo } from '../api/tasks-api'
 import Auth from '../auth/Auth'
 import { Todo } from '../types/Todo'
 
@@ -37,163 +35,163 @@ export class Todos extends React.PureComponent<TodosProps, TodosState> {
     loadingTodos: true
   }
 
-  handleNameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    this.setState({ newTodoName: event.target.value })
-  }
+  // handleNameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  //   this.setState({ newTodoName: event.target.value })
+  // }
 
-  onEditButtonClick = (todoId: string) => {
-    this.props.history.push(`/todos/${todoId}/edit`)
-  }
+  // onEditButtonClick = (todoId: string) => {
+  //   this.props.history.push(`/todos/${todoId}/edit`)
+  // }
 
-  onTodoCreate = async (event: React.ChangeEvent<HTMLButtonElement>) => {
-    try {
-      const dueDate = this.calculateDueDate()
-      const newTodo = await createTodo(this.props.auth.getIdToken(), {
-        name: this.state.newTodoName,
-        dueDate
-      })
-      this.setState({
-        todos: [...this.state.todos, newTodo],
-        newTodoName: ''
-      })
-      Swal.fire({
-        icon: 'success',
-        text: 'Create todo success!'
-      })
-    } catch (e :any) {
-      if(e.response.status === 400) {
-        Swal.fire({
-          icon: 'error',
-          title: 'Todo creation failed!',
-          text: 'Invalid todo name'
-        })
-      } else {
-      Swal.fire({
-        icon: 'error',
-        title: 'Todo creation failed!',
-        text: 'Something went wrong!',
-        footer: e.message
-      })
-    }
-  }
-  }
+  // onTodoCreate = async (event: React.ChangeEvent<HTMLButtonElement>) => {
+  //   try {
+  //     const dueDate = this.calculateDueDate()
+  //     const newTodo = await createTodo(this.props.auth.getIdToken(), {
+  //       name: this.state.newTodoName,
+  //       dueDate
+  //     })
+  //     this.setState({
+  //       todos: [...this.state.todos, newTodo],
+  //       newTodoName: ''
+  //     })
+  //     Swal.fire({
+  //       icon: 'success',
+  //       text: 'Create todo success!'
+  //     })
+  //   } catch (e :any) {
+  //     if(e.response.status === 400) {
+  //       Swal.fire({
+  //         icon: 'error',
+  //         title: 'Todo creation failed!',
+  //         text: 'Invalid todo name'
+  //       })
+  //     } else {
+  //     Swal.fire({
+  //       icon: 'error',
+  //       title: 'Todo creation failed!',
+  //       text: 'Something went wrong!',
+  //       footer: e.message
+  //     })
+  //   }
+  // }
+  // }
 
-  onTodoDelete = async (todoId: string) => {
-    try {
-      await deleteTodo(this.props.auth.getIdToken(), todoId)
-      Swal.fire({
-        icon: 'success',
-        text: 'Delete todo success!'
-      })
-      this.setState({
-        todos: this.state.todos.filter(todo => todo.todoId !== todoId)
-      })
+  // onTodoDelete = async (todoId: string) => {
+  //   try {
+  //     await deleteTodo(this.props.auth.getIdToken(), todoId)
+  //     Swal.fire({
+  //       icon: 'success',
+  //       text: 'Delete todo success!'
+  //     })
+  //     this.setState({
+  //       todos: this.state.todos.filter(todo => todo.todoId !== todoId)
+  //     })
 
-    } catch {
-      Swal.fire({
-        icon: 'error',
-        title: 'Deletion fail',
-      })
-    }
-  }
+  //   } catch {
+  //     Swal.fire({
+  //       icon: 'error',
+  //       title: 'Deletion fail',
+  //     })
+  //   }
+  // }
 
-  onTodoCheck = async (pos: number) => {
-    try {
-      const todo = this.state.todos[pos]
-      await patchTodo(this.props.auth.getIdToken(), todo.todoId, {
-        name: todo.name,
-        dueDate: todo.dueDate,
-        done: !todo.done
-      })
-      this.setState({
-        todos: update(this.state.todos, {
-          [pos]: { done: { $set: !todo.done } }
-        })
-      })
-    } catch {
-      Swal.fire({
-        icon: 'error',
-        title: 'Todo deletion failed',
-      })
-    }
-  }
+  // onTodoCheck = async (pos: number) => {
+  //   try {
+  //     const todo = this.state.todos[pos]
+  //     await patchTodo(this.props.auth.getIdToken(), todo.todoId, {
+  //       name: todo.name,
+  //       dueDate: todo.dueDate,
+  //       done: !todo.done
+  //     })
+  //     this.setState({
+  //       todos: update(this.state.todos, {
+  //         [pos]: { done: { $set: !todo.done } }
+  //       })
+  //     })
+  //   } catch {
+  //     Swal.fire({
+  //       icon: 'error',
+  //       title: 'Todo deletion failed',
+  //     })
+  //   }
+  // }
 
-  async componentDidMount() {
-    try {
-      const todos = await getTodos(this.props.auth.getIdToken())
-      this.setState({
-        todos,
-        loadingTodos: false
-      })
-    } catch (e: any) {
-      Swal.fire({
-        icon: 'error',
-        title: 'Failed to fetch todos',
-        text: e.message
-      })
-    }
-  }
+  // async componentDidMount() {
+  //   try {
+  //     const todos = await getTodos(this.props.auth.getIdToken())
+  //     this.setState({
+  //       todos,
+  //       loadingTodos: false
+  //     })
+  //   } catch (e: any) {
+  //     Swal.fire({
+  //       icon: 'error',
+  //       title: 'Failed to fetch todos',
+  //       text: e.message
+  //     })
+  //   }
+  // }
 
-  render() {
-    return (
-      <div>
-        <Header as="h1">TODOs</Header>
+  // render() {
+  //   return (
+  //     <div>
+  //       <Header as="h1">TODOs</Header>
 
-        {this.renderCreateTodoInput()}
+  //       {this.renderCreateTodoInput()}
 
-        {this.renderTodos()}
-      </div>
-    )
-  }
+  //       {this.renderTodos()}
+  //     </div>
+  //   )
+  // }
 
-  renderCreateTodoInput() {
-    return (
-      <Grid.Row>
-        <Grid.Column width={16}>
-          <Input
-            action={{
-              color: 'teal',
-              labelPosition: 'left',
-              icon: 'add',
-              content: 'New task',
-              onClick: this.onTodoCreate
-            }}
-            fluid
-            actionPosition="left"
-            placeholder="To change the world..."
-            onChange={this.handleNameChange}
-            value={this.state.newTodoName}
-          />
-        </Grid.Column>
-        <Grid.Column width={16}>
-          <Divider />
-        </Grid.Column>
-      </Grid.Row>
-    )
-  }
+  // renderCreateTodoInput() {
+  //   return (
+  //     <Grid.Row>
+  //       <Grid.Column width={16}>
+  //         <Input
+  //           action={{
+  //             color: 'teal',
+  //             labelPosition: 'left',
+  //             icon: 'add',
+  //             content: 'New task',
+  //             onClick: this.onTodoCreate
+  //           }}
+  //           fluid
+  //           actionPosition="left"
+  //           placeholder="To change the world..."
+  //           onChange={this.handleNameChange}
+  //           value={this.state.newTodoName}
+  //         />
+  //       </Grid.Column>
+  //       <Grid.Column width={16}>
+  //         <Divider />
+  //       </Grid.Column>
+  //     </Grid.Row>
+  //   )
+  // }
 
-  renderTodos() {
-    if (this.state.loadingTodos) {
-      return this.renderLoading()
-    }
+  // renderTodos() {
+  //   if (this.state.loadingTodos) {
+  //     return this.renderLoading()
+  //   }
 
-    return this.renderTodosList()
-  }
+  //   return this.renderTodosList()
+  // }
 
-  renderLoading() {
-    return (
-      <Grid.Row>
-        <Loader indeterminate active inline="centered">
-          Loading TODOs
-        </Loader>
-      </Grid.Row>
-    )
-  }
+  // renderLoading() {
+  //   return (
+  //     <Grid.Row>
+  //       <Loader indeterminate active inline="centered">
+  //         Loading TODOs
+  //       </Loader>
+  //     </Grid.Row>
+  //   )
+  // }
 
   renderTodosList() {
     return (
       <Grid padded>
-        {this.state.todos.map((todo, pos) => {
+        {/* {this.state.todos.map((todo, pos) => {
           return (
             <Grid.Row key={todo.todoId}>
               <Grid.Column width={1} verticalAlign="middle">
@@ -234,15 +232,15 @@ export class Todos extends React.PureComponent<TodosProps, TodosState> {
               </Grid.Column>
             </Grid.Row>
           )
-        })}
+        })} */}
       </Grid>
     )
   }
 
-  calculateDueDate(): string {
-    const date = new Date()
-    date.setDate(date.getDate() + 7)
+//   calculateDueDate(): string {
+//     const date = new Date()
+//     date.setDate(date.getDate() + 7)
 
-    return dateFormat(date, 'yyyy-mm-dd') as string
-  }
+//     return dateFormat(date, 'yyyy-mm-dd') as string
+//   }
 }

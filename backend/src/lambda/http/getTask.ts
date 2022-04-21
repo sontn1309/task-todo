@@ -1,16 +1,16 @@
 import 'source-map-support/register'
 
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda'
-import { getTodosForUser } from '../../businessLogic/todos'
+import { getTasksForUser } from '../../businessLogic/Tasks'
 import { createLogger } from '../../utils/logger'
 
-const logger = createLogger('GetTodos')
-// TODO: Get all TODO items for a current user
+const logger = createLogger('GetTask')
 export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
-    logger.info('GetTodos. Event', { event })
-    // Write your code here
-    const items = await getTodosForUser(event);
-
+    logger.info('GetTask. Event', { event })
+   
+  const status = String(event.queryStringParameters.status);
+  const result = await getTasksForUser(event);
+  const items = result.filter(x => x.status === status)
   return {
     statusCode: 200,
     headers: {

@@ -58,7 +58,7 @@ export default class App extends Component<AppProps, AppState> {
           path="/"
           exact
           render={props => {
-            return <TaskList />
+            return <TaskList history={this.props.history} auth={this.props.auth}/>
           }}
         />
 

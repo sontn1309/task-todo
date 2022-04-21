@@ -2,17 +2,17 @@ import 'source-map-support/register'
 
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda'
 
-import { deleteTodo } from '../../businessLogic/todos'
+import { deleteTask } from '../../businessLogic/Tasks'
 import { createLogger } from '../../utils/logger'
 import { getUserId } from '../utils'
 
-const logger = createLogger('deleteTodo')
+const logger = createLogger('Delete task')
 export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
-    logger.info('DeleteTodo. Event: ', { event })
-    const todoId = event.pathParameters.todoId
+    logger.info('Delete task. Event: ', { event })
+    const taskId = event.pathParameters.taskId
     // TODO: Remove a TODO item by id
     const userId = getUserId(event)
-    await deleteTodo(userId, todoId)
+    await deleteTask(userId, taskId)
 
     return {
       statusCode: 204,

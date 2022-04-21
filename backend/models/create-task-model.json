@@ -1,24 +1,20 @@
 {
   "$schema": "http://json-schema.org/draft-04/schema#",
-  "title": "updateTodo",
+  "title": "createTask",
   "type": "object",
   "properties": {
-    "name": {
+    "title": {
       "type": "string",
       "pattern": "^(?!\\s*$).+"
     },
-    "dueDate": {
+    "description": {
       "type": "string",
       "pattern": "^(?!\\s*$).+"
-    },
-    "done": {
-      "type": "boolean"
     }
   },
   "required": [
-    "name",
-    "dueDate",
-    "done"
+    "title",
+    "description"
   ],
   "additionalProperties": false
 }

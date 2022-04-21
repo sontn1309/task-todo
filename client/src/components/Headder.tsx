@@ -7,24 +7,14 @@ import {
   Nav,
   Navbar,
   Container,
-  Dropdown
 } from 'react-bootstrap'
 import {
-  MDBContainer,
-  MDBNavbar,
-  MDBNavbarBrand,
-  MDBNavbarToggler,
-  MDBIcon,
-  MDBNavbarNav,
   MDBNavbarItem,
-  MDBNavbarLink,
-  MDBBtn,
   MDBDropdown,
   MDBDropdownToggle,
   MDBDropdownMenu,
   MDBDropdownItem,
   MDBDropdownLink,
-  MDBCollapse
 } from 'mdb-react-ui-kit';
 
 export interface LogInProps {
@@ -42,9 +32,6 @@ export class Headder extends React.PureComponent<LogInProps, LogInState> {
     this.handleLogout = this.handleLogout.bind(this)
   }
 
-  userInformationClick = () => {
-    this.props.history.push(`/user/information`)
-  }
 
   backHome = () => {
     this.props.history.push(`/`)
@@ -94,18 +81,14 @@ export class Headder extends React.PureComponent<LogInProps, LogInState> {
       return (
 
         <Nav className="me-auto justify-content-md-left">
-          <Navbar.Brand style={{ padding: '0.75em 8em 1em 0em' }} onClick={() => this.backHome()}><BsFillAlarmFill /></Navbar.Brand>
-          <Nav.Link  onClick={() => this.backHome()}  style={{ padding: '0.75em 8em 0.5em 0em' }} >Home</Nav.Link>
-          <Nav.Link style={{ padding: '0.75em 8em 0.5em 0em' }} onClick={() => this.backHome()}>All task</Nav.Link>
+          <Navbar.Brand style={{ padding: '0.75em 4em 1em 4em' }} onClick={() => this.backHome()}><BsFillAlarmFill /></Navbar.Brand>
+          <Nav.Link  onClick={() => this.backHome()}  style={{ padding: '0.75em 4em 0.5em 4em' }} >Home</Nav.Link>
           <MDBNavbarItem>
               <MDBDropdown >
-                <MDBDropdownToggle tag='a' className='nav-link' style={{ padding: '0.75em 8em 0.5em 0.5em' }}>
+                <MDBDropdownToggle tag='a' className='nav-link' style={{ padding: '0.75em 4em 0.5em 4em' }}>
                 <BsFillPersonLinesFill/>
                 </MDBDropdownToggle>
                 <MDBDropdownMenu>
-                  <MDBDropdownItem>
-                    <MDBDropdownLink onClick={() => this.userInformationClick()}>User information</MDBDropdownLink>
-                  </MDBDropdownItem>
                   <MDBDropdownItem>
                     <MDBDropdownLink onClick={this.handleLogout}>Sign out</MDBDropdownLink>
                   </MDBDropdownItem>
@@ -117,9 +100,8 @@ export class Headder extends React.PureComponent<LogInProps, LogInState> {
     } else {
       return (
         <Nav className="me-auto justify-content-md-center">
-          <Navbar.Brand style={{ padding: '0.5em 8em 1em 0em' }} href="#home"><BsFillAlarmFill /></Navbar.Brand>
-          <Nav.Link style={{ padding: '1em 8em 0em 0em' }} >Home</Nav.Link>
-          <Nav.Link style={{ padding: '1em 8em 0em 0em' }} onClick={this.handleLogin}>Sign in</Nav.Link>
+          <Navbar.Brand style={{ padding: '0.5em 4em 1em 4em' }} href="#home"><BsFillAlarmFill /></Navbar.Brand>
+          <Nav.Link style={{ padding: '0.5em 4em 0em 4em' }} onClick={this.handleLogin}>Sign in</Nav.Link>
         </Nav>
       )
     }

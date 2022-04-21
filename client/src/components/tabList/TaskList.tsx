@@ -6,8 +6,13 @@ import {
     MDBTabsContent,
     MDBTabsPane
 } from 'mdb-react-ui-kit';
-import { Task } from './Task'
+import { TaskDefine } from './TaskDefine'
+import { TaskDone } from './TaskDone'
+import { TaskInprocess } from './TaskInprocess'
+import Auth from '../../auth/Auth'
 export interface TaskListProps {
+    auth: Auth
+    history: History
 }
 
 export interface TaskListState {
@@ -54,9 +59,9 @@ export class TaskList extends React.PureComponent<TaskListProps, TaskListState> 
                 </MDBTabs>
 
                 <MDBTabsContent>
-                    <MDBTabsPane show={this.state.verticalActive === 'tab1'}><Task colorBorder="danger" textColor="text-white"/></MDBTabsPane>
-                    <MDBTabsPane show={this.state.verticalActive === 'tab2'}><Task colorBorder="secondary" textColor="text-white"/></MDBTabsPane>
-                    <MDBTabsPane show={this.state.verticalActive === 'tab3'}><Task colorBorder="success" textColor="text-white"/></MDBTabsPane>
+                    <MDBTabsPane show={this.state.verticalActive === 'tab1'}><TaskDefine history={this.props.history} auth={this.props.auth} colorBorder="dark" textColor="text-white"/></MDBTabsPane>
+                    <MDBTabsPane show={this.state.verticalActive === 'tab2'}><TaskInprocess  history={this.props.history} auth={this.props.auth} colorBorder="dark" textColor="text-white"/></MDBTabsPane>
+                    <MDBTabsPane show={this.state.verticalActive === 'tab3'}><TaskDone history={this.props.history} auth={this.props.auth} colorBorder="dark" textColor="text-white"/></MDBTabsPane>
                 </MDBTabsContent>
             </>
         )

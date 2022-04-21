@@ -3,17 +3,18 @@ import { Todo } from '../types/Todo';
 import { CreateTodoRequest } from '../types/CreateTodoRequest';
 import Axios from 'axios'
 import { UpdateTodoRequest } from '../types/UpdateTodoRequest';
+import { TaskModel } from '../types/Task';
 
-export async function getTodos(idToken: string): Promise<Todo[]> {
+export async function getTasks(idToken: string, status: string): Promise<TaskModel[]> {
   console.log('Fetching todos')
 
-  const response = await Axios.get(`${apiEndpoint}/todos`, {
+  const response = await Axios.get(`${apiEndpoint}/tasks?status=${status}`, {
     headers: {
       'Content-Type': 'application/json',
       'Authorization': `Bearer ${idToken}`
     },
   })
-  console.log('Todos:', response.data)
+  console.log('Tasks:', response.data)
   return response.data.items
 }
 
@@ -43,11 +44,11 @@ export async function patchTodo(
   })
 }
 
-export async function deleteTodo(
+export async function deleteTask(
   idToken: string,
-  todoId: string
+  taskId: string
 ): Promise<void> {
-  await Axios.delete(`${apiEndpoint}/todos/${todoId}`, {
+  await Axios.delete(`${apiEndpoint}/tasks/${taskId}`, {
     headers: {
       'Content-Type': 'application/json',
       'Authorization': `Bearer ${idToken}`
