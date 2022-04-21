@@ -47,83 +47,83 @@ export class TaskInprocess extends React.PureComponent<TaskProps, TaskState> {
         this.toggleShow = this.toggleShow.bind(this)
     }
 
- toggleShow(){
-    if(this.state.basicModal === true) {
-        this.setState({
-            basicModal:false
-        })
-    } else {
-        this.setState({
-            basicModal:true
-        })
+    toggleShow() {
+        if (this.state.basicModal === true) {
+            this.setState({
+                basicModal: false
+            })
+        } else {
+            this.setState({
+                basicModal: true
+            })
+        }
     }
-}
-async componentDidMount() {
-    try {
-        const tasksResult = await getTasks(this.props.auth.getIdToken(), "inprocess")
-        this.setState({
-            tasks: tasksResult,
-            loadingTodos: false
-        })
-    } catch (e: any) {
-        Swal.fire({
-            icon: 'error',
-            title: 'Failed to fetch tasks',
-            text: e.message
-        })
+    async componentDidMount() {
+        try {
+            const tasksResult = await getTasks(this.props.auth.getIdToken(), "inprocess")
+            this.setState({
+                tasks: tasksResult,
+                loadingTodos: false
+            })
+        } catch (e: any) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Failed to fetch tasks',
+                text: e.message
+            })
+        }
     }
-}
-renderTasksBody() {
-    if (this.state.loadingTodos) {
-        return this.renderLoading()
-    }
+    renderTasksBody() {
+        if (this.state.loadingTodos) {
+            return this.renderLoading()
+        }
 
-    return this.renderTasks()
-}
-async removeTask(taskId: string) {
-    try {
-        Swal.fire({
-            title: 'Do you want to delete the task?',
-            showCancelButton: true,
-            confirmButtonText: 'Yes',
-        }).then(async (result) => {
-            if (result.isConfirmed) {
-                Swal.fire({
-                    title: 'Deleting task...',
-                    timer: 2000,
-                    timerProgressBar: true,
-                    didOpen: async () => {
-                        Swal.showLoading()
-                        await deleteTask(this.props.auth.getIdToken(), taskId)
-                    },
-                    willClose: () => {
-                        Swal.fire('Deleted!', '', 'success')
-                        this.setState({
-                            tasks: this.state.tasks.filter(task => task.taskId !== taskId)
-                        })
-                    }
-                })
-
-            }
-        })
-    } catch {
-        Swal.fire({
-            icon: 'error',
-            title: 'Deletion fail',
-        })
+        return this.renderTasks()
     }
-}
-renderTasks() {
-    return (
-        <>
-            {this.state.tasks.map((task) => {
-                return (<MDBCol>
-                    <MDBCard border={this.props.colorBorder}>
-                        <MDBCardHeader border={this.props.colorBorder}  background='light'>
-                        <Grid>
+    async removeTask(taskId: string) {
+        try {
+            Swal.fire({
+                title: 'Do you want to delete the task?',
+                showCancelButton: true,
+                confirmButtonText: 'Yes',
+            }).then(async (result) => {
+                if (result.isConfirmed) {
+                    Swal.fire({
+                        title: 'Deleting task...',
+                        timer: 2000,
+                        timerProgressBar: true,
+                        didOpen: async () => {
+                            Swal.showLoading()
+                            await deleteTask(this.props.auth.getIdToken(), taskId)
+                        },
+                        willClose: () => {
+                            Swal.fire('Deleted!', '', 'success')
+                            this.setState({
+                                tasks: this.state.tasks.filter(task => task.taskId !== taskId)
+                            })
+                        }
+                    })
+
+                }
+            })
+        } catch {
+            Swal.fire({
+                icon: 'error',
+                title: 'Deletion fail',
+            })
+        }
+    }
+    renderTasks() {
+        return (
+            <>
+                {this.state.tasks.map((task) => {
+                    return (<MDBCol>
+                        <MDBCard border={this.props.colorBorder} background='light' className='shadow-5-strong'>
+                            <MDBCardHeader border={this.props.colorBorder} background='light'>
+                                <Grid>
                                     <Grid.Row>
                                         <Grid.Column width={10} verticalAlign="middle" className="mx-auto">
-                                               <b style={{fontSize: "1.5em"}}> {task.dateCreate} </b>
+                                            <b style={{ fontSize: "1.5em" }}> {task.dateCreate} </b>
                                         </Grid.Column>
                                         <Grid.Column width={1} floated="right">
                                             <Button
@@ -137,51 +137,51 @@ renderTasks() {
                                     </Grid.Row>
                                 </Grid>
                             </MDBCardHeader>
-                        <MDBCardBody>
-                            <MDBCardTitle>{task.title}</MDBCardTitle>
-                            <MDBCardText>
-                                {task.description}
-                            </MDBCardText>
-                        </MDBCardBody>
-                        <MDBCardFooter background='transparent' border={this.props.colorBorder} className="mx-auto">
+                            <MDBCardBody>
+                                <MDBCardTitle>{task.title}</MDBCardTitle>
+                                <MDBCardText>
+                                    {task.description}
+                                </MDBCardText>
+                            </MDBCardBody>
+                            <MDBCardFooter background='transparent' border={this.props.colorBorder} className="mx-auto">
                                 <Fragment>
                                     <MDBBtn color="primary" className="mx-1" onClick={() => this.toggleShow()}>Edit</MDBBtn>
-                                    <MDBBtn color="danger"  className="mx-1">Define</MDBBtn>
-                                    <MDBBtn color="success"  className="mx-1">Done</MDBBtn>
+                                    <MDBBtn color="danger" className="mx-1">Define</MDBBtn>
+                                    <MDBBtn color="success" className="mx-1">Done</MDBBtn>
                                 </Fragment>
                             </MDBCardFooter>
-                    </MDBCard>
-                </MDBCol>)
-            })
-            }
-        </>
-    )
-}
-renderLoading() {
-    return (
-        <MDBCol>
-            <MDBCard border={this.props.colorBorder}>
-                <MDBCardHeader ></MDBCardHeader>
-                <MDBCardBody>
-                    <MDBCardTitle></MDBCardTitle>
-                    <MDBCardText>
-                        <Loader indeterminate active inline="centered">
-                            Loading Taks
-                        </Loader>
-                    </MDBCardText>
-                </MDBCardBody>
-                <MDBCardFooter background='transparent'  className="justify-content-center">
-                </MDBCardFooter>
-            </MDBCard>
-        </MDBCol>
-    )
-}
+                        </MDBCard>
+                    </MDBCol>)
+                })
+                }
+            </>
+        )
+    }
+    renderLoading() {
+        return (
+            <MDBCol>
+                <MDBCard border={this.props.colorBorder}>
+                    <MDBCardHeader ></MDBCardHeader>
+                    <MDBCardBody>
+                        <MDBCardTitle></MDBCardTitle>
+                        <MDBCardText>
+                            <Loader indeterminate active inline="centered">
+                                Loading Taks
+                            </Loader>
+                        </MDBCardText>
+                    </MDBCardBody>
+                    <MDBCardFooter background='transparent' className="justify-content-center">
+                    </MDBCardFooter>
+                </MDBCard>
+            </MDBCol>
+        )
+    }
 
     render() {
         return (
             <>
                 <MDBRow className='row-cols-1 row-cols-md-3 g-4'>
-                   {this.renderTasksBody()}
+                    {this.renderTasksBody()}
                 </MDBRow>
                 <MDBModal show={this.state.basicModal} setShow={this.state.basicModal} tabIndex='-1'>
                     <MDBModalDialog>

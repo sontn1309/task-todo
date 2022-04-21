@@ -40,7 +40,7 @@ export class TaskList extends React.PureComponent<TaskListProps, TaskListState> 
     render() {
         return (
             <>
-                <MDBTabs fill className='mb-3'>
+                <MDBTabs pills justify  className='mb-3'>
                     <MDBTabsItem>
                         <MDBTabsLink onClick={() => this.handleFillClick('tab1')} active={this.state.verticalActive === 'tab1'}>
                             Define
@@ -51,9 +51,9 @@ export class TaskList extends React.PureComponent<TaskListProps, TaskListState> 
                             Inprocess
                         </MDBTabsLink>
                     </MDBTabsItem>
-                    <MDBTabsItem>
+                    <MDBTabsItem border='dark'>
                         <MDBTabsLink onClick={() => this.handleFillClick('tab3')} active={this.state.verticalActive === 'tab3'}>
-                            Complete
+                             Complete
                         </MDBTabsLink>
                     </MDBTabsItem>
                 </MDBTabs>

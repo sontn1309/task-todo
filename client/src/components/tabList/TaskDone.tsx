@@ -117,7 +117,7 @@ export class TaskDone extends React.PureComponent<TaskProps, TaskState> {
             <>
                 {this.state.tasks.map((task) => {
                     return (<MDBCol>
-                        <MDBCard border={this.props.colorBorder}>
+                        <MDBCard border={this.props.colorBorder} background='light' className='shadow-5-strong'>
                             <MDBCardHeader border={this.props.colorBorder}  background='light'>
                                 <Grid>
                                     <Grid.Row>
