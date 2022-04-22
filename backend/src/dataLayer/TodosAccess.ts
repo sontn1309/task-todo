@@ -10,7 +10,10 @@ AWS.config.update({
     region: "us-west-2",
 });
 
+import { createLogger } from '../utils/logger'
 const XAWS = AWSXRay.captureAWS(AWS)
+
+const logger = createLogger('Task Magnage')
 
 export class TodosAccess {
   constructor(
@@ -41,15 +44,15 @@ async getTaskItems(userId: string): Promise<TaskModel[]> {
     const result = await this.docClient.get({
       TableName: this.taskTable,
       Key: {
-        taskId,
-        userId
+        "userId": userId,
+        "taskId": taskId
       }
     }).promise()
 
     return result.Item as TaskModel
   }
 
-  async createTodoItem(taskItem: TaskModel) {
+  async createTask(taskItem: TaskModel) {
     await this.docClient.put({
       TableName: this.taskTable,
       Item: taskItem,
@@ -63,14 +66,29 @@ async getTaskItems(userId: string): Promise<TaskModel[]> {
         taskId,
         userId
       },
-      UpdateExpression: 'set #title = :title, description = :description, status = :status',
-      ExpressionAttributeNames: {
-        "#title": "title"
-      },
+      UpdateExpression: 'set title = :title, description = :description',
       ExpressionAttributeValues: {
         ":title": taskUpdate.title,
         ":description": taskUpdate.description,
-        ":status": taskUpdate.status
+      }
+    }).promise()   
+  }
+
+  async updateStatus(taskId: string, userId :string, status: string) {
+    logger.info('Update status', taskId,userId, status)
+
+    await this.docClient.update({
+      TableName: this.taskTable,
+      Key: {
+        "userId": userId,
+        "taskId": taskId
+      },
+      UpdateExpression: 'set #status = :status',
+      ExpressionAttributeNames: {
+        "#status": "status"
+      },
+      ExpressionAttributeValues: {
+        ":status": status,
       }
     }).promise()   
   }

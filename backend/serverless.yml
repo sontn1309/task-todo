@@ -27,12 +27,12 @@ custom:
         title: Udagram API
         description: Serverless
     models:
-      - name: CreateTodoRequest
+      - name: SaveTaskRequest
         contentType: application/json
         schema: ${file(models/create-task-model.json)}
-      - name: UpdateTodoRequest
-        contentType: application/json
-        schema: ${file(models/update-task-model.json)}
+      # - name: UpdateTodoRequest
+      #   contentType: application/json
+      #   schema: ${file(models/update-task-model.json)}
   logs:
     restApi: true
 functions:
@@ -58,26 +58,48 @@ functions:
           - dynamodb:Query
           - dynamodb:Scan
         Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.TASK_TABLE}/index/${self:provider.environment.TASK_INDEX}
-  # CreateTodo:
-  #   handler: src/lambda/http/createTodo.handler
-  #   events:
-  #     - http:
-  #         method: post
-  #         path: todos
-  #         cors: true
-  #         authorizer: Auth
-  #         reqValidatorName: RequestBodyValidator
-  #         documentation:
-  #           summary: Create a new todo
-  #           description: Create a new todo
-  #           requestModels:
-  #             application/json: CreateTodoRequest
-  #   iamRoleStatements:
-  #     - Effect: Allow
-  #       Action:
-  #         - dynamodb:Query
-  #         - dynamodb:PutItem
-  #       Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.TASK_TABLE}
+  UpdateStatus:
+    handler: src/lambda/http/updateStatusTask.handler
+    events:
+      - http:
+          method: patch
+          path: tasks/{taskId}
+          cors: true
+          authorizer: Auth
+          reqValidatorName: RequestBodyValidator
+          request:
+            parameters:
+              querystrings:
+                status: true
+    iamRoleStatements:
+      - Effect: Allow
+        Action:
+          - dynamodb:Query
+          - dynamodb:UpdateItem
+          - dynamodb:GetItem
+        Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.TASK_TABLE}
+  SaveTask:
+    handler: src/lambda/http/saveTask.handler
+    events:
+      - http:
+          method: post
+          path: tasks
+          cors: true
+          authorizer: Auth
+          reqValidatorName: RequestBodyValidator
+          documentation:
+            summary: Save task
+            description: save task
+            requestModels:
+              application/json: SaveTaskRequest
+    iamRoleStatements:
+      - Effect: Allow
+        Action:
+          - dynamodb:Query
+          - dynamodb:UpdateItem
+          - dynamodb:GetItem
+          - dynamodb:PutItem
+        Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.TASK_TABLE}
   # UpdateTodo:
   #   handler: src/lambda/http/updateTodo.handler
   #   events:

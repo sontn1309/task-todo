@@ -56,19 +56,18 @@ export async function deleteTask(
   })
 }
 
-export async function getUploadUrl(
+export async function updateStatus(
   idToken: string,
-  todoId: string
-): Promise<string> {
-  const response = await Axios.post(`${apiEndpoint}/todos/${todoId}/attachment`, '', {
+  taskId: string,
+  status: string
+): Promise<void> {
+  await Axios.patch(`${apiEndpoint}/tasks/${taskId}?status=${status}`, JSON.stringify({status}), {
     headers: {
       'Content-Type': 'application/json',
       'Authorization': `Bearer ${idToken}`
     }
   })
-  return response.data.uploadUrl
 }
 
-export async function uploadFile(uploadUrl: string, file: Buffer): Promise<void> {
-  await Axios.put(uploadUrl, file)
-}
+
+

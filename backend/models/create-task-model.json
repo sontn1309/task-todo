@@ -7,6 +7,9 @@
       "type": "string",
       "pattern": "^(?!\\s*$).+"
     },
+    "taskId": {
+      "type": "string"
+    },
     "description": {
       "type": "string",
       "pattern": "^(?!\\s*$).+"

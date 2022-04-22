@@ -10,11 +10,17 @@ import {
     MDBModalTitle,
     MDBModalBody,
     MDBModalFooter,
+    MDBBadge,
+    MDBInput,
+    MDBTextArea,
+    MDBInputGroup
+
 } from 'mdb-react-ui-kit';
 import Swal from 'sweetalert2'
-import { getTasks, deleteTask } from '../../api/tasks-api'
+import { getTasks, deleteTask, updateStatus } from '../../api/tasks-api'
 import Auth from '../../auth/Auth'
 import { TaskModel } from '../../types/Task'
+import { History } from 'history'
 
 import {
     Button,
@@ -46,6 +52,11 @@ export class TaskDefine extends React.PureComponent<TaskProps, TaskState> {
         }
         this.toggleShow = this.toggleShow.bind(this)
     }
+
+    backHome = () => {
+        this.props.history.push(`/`)
+    }
+
     async componentDidMount() {
         try {
             const tasksResult = await getTasks(this.props.auth.getIdToken(), "define")
@@ -61,6 +72,7 @@ export class TaskDefine extends React.PureComponent<TaskProps, TaskState> {
             })
         }
     }
+
 
     async removeTask(taskId: string) {
         try {
@@ -95,6 +107,44 @@ export class TaskDefine extends React.PureComponent<TaskProps, TaskState> {
             })
         }
     }
+
+    async updateStatus(taskId: string, status: string) {
+        try {
+            Swal.fire({
+                title: 'Do you want to change status to ' + status + "?",
+                showCancelButton: true,
+                confirmButtonText: 'Yes',
+            }).then(async (result) => {
+                if (result.isConfirmed) {
+                    Swal.fire({
+                        title: 'Moving status...',
+                        timer: 2000,
+                        timerProgressBar: true,
+                        didOpen: async () => {
+                            Swal.showLoading()
+                            console.log(this.props.auth.getIdToken(), status)
+                            await updateStatus(this.props.auth.getIdToken(), taskId, status)
+                        },
+                        willClose: async () => {
+                            Swal.fire('Moved!', '', 'success')
+                            const item = await getTasks(this.props.auth.getIdToken(), "define");
+                            this.setState({
+                                tasks: item
+                            })
+                        }
+                    })
+
+                }
+            })
+        } catch {
+            Swal.fire({
+                icon: 'error',
+                title: 'Deletion fail',
+            })
+        }
+    }
+
+
 
     toggleShow() {
         if (this.state.basicModal === true) {
@@ -145,11 +195,11 @@ export class TaskDefine extends React.PureComponent<TaskProps, TaskState> {
                 {this.state.tasks.map((task) => {
                     return (<MDBCol>
                         <MDBCard border={this.props.colorBorder} background='light' className='shadow-5-strong'>
-                            <MDBCardHeader border={this.props.colorBorder}  background='light'>
+                            <MDBCardHeader border={this.props.colorBorder} background='light'>
                                 <Grid>
                                     <Grid.Row>
                                         <Grid.Column width={10} verticalAlign="middle" className="mx-auto">
-                                               <b style={{fontSize: "1.5em"}}> {task.dateCreate} </b>
+                                            <b style={{ fontSize: "1.25em" }}> {task.title} </b>
                                         </Grid.Column>
                                         <Grid.Column width={1} floated="right">
                                             <Button
@@ -164,16 +214,16 @@ export class TaskDefine extends React.PureComponent<TaskProps, TaskState> {
                                 </Grid>
                             </MDBCardHeader>
                             <MDBCardBody>
-                                <MDBCardTitle>{task.title}</MDBCardTitle>
+                                <MDBCardTitle><b style={{ fontSize: "1.75em" }}>{task.description}</b></MDBCardTitle>
                                 <MDBCardText>
-                                    {task.description}
+                                    <h5> <MDBBadge color='dark'>{task.dateCreate}</MDBBadge>  </h5>
                                 </MDBCardText>
                             </MDBCardBody>
                             <MDBCardFooter background='transparent' border={this.props.colorBorder} className="mx-auto">
                                 <Fragment>
                                     <MDBBtn color="primary" className="mx-1" onClick={() => this.toggleShow()}>Edit</MDBBtn>
-                                    <MDBBtn color="secondary" className="mx-1">Inprocess</MDBBtn>
-                                    <MDBBtn color="success" className="mx-1">Done</MDBBtn>
+                                    <MDBBtn color="secondary" className="mx-1" onClick={() => this.updateStatus(task.taskId, "inprocess")}>Inprocess</MDBBtn>
+                                    <MDBBtn color="success" className="mx-1" onClick={() => this.updateStatus(task.taskId, "done")}>Done</MDBBtn>
                                 </Fragment>
                             </MDBCardFooter>
                         </MDBCard>
@@ -209,11 +259,19 @@ export class TaskDefine extends React.PureComponent<TaskProps, TaskState> {
                     <MDBModalDialog>
                         <MDBModalContent>
                             <MDBModalHeader>
-                                <MDBModalTitle>Edit/Create Task</MDBModalTitle>
-                                <MDBBtn className='btn-close' color='none' onClick={this.toggleShow}></MDBBtn>
-                            </MDBModalHeader>
-                            <MDBModalBody>...</MDBModalBody>
+                                <MDBModalTitle><div>
+                                    <h4>
 
+                                        <MDBBadge className="mr-4" color='dark'>{new Date().toLocaleString()}</MDBBadge>
+                                    </h4>
+                                </div>
+                                </MDBModalTitle>
+                            </MDBModalHeader>
+                            <MDBModalBody >
+                                <input className='form-control mb-3' type='text' placeholder='Title of the task' />
+
+                                <textarea className='form-control' rows={5} cols={33} placeholder='Description of the task' />
+                            </MDBModalBody>
                             <MDBModalFooter>
                                 <MDBBtn color='secondary' onClick={this.toggleShow}>
                                     Close

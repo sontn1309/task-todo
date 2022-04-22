@@ -3,7 +3,6 @@ import { Route, Router, Switch } from 'react-router-dom'
 import { Grid, Segment } from 'semantic-ui-react'
 
 import Auth from './auth/Auth'
-import { EditTodo } from './components/EditTodo'
 import { Carousel } from './components/Carousel'
 import { TaskList } from './components/tabList/TaskList'
 import { NotFound } from './components/NotFound'
@@ -58,18 +57,9 @@ export default class App extends Component<AppProps, AppState> {
           path="/"
           exact
           render={props => {
-            return <TaskList history={this.props.history} auth={this.props.auth}/>
+            return <TaskList {...props} auth={this.props.auth}/>
           }}
         />
-
-        <Route
-          path="/todos/:todoId/edit"
-          exact
-          render={props => {
-            return <EditTodo {...props} auth={this.props.auth} />
-          }}
-        />
-
         <Route component={NotFound} />
       </Switch>
     )

@@ -10,6 +10,8 @@ import { TaskDefine } from './TaskDefine'
 import { TaskDone } from './TaskDone'
 import { TaskInprocess } from './TaskInprocess'
 import Auth from '../../auth/Auth'
+import { History } from 'history'
+
 export interface TaskListProps {
     auth: Auth
     history: History
@@ -25,17 +27,36 @@ export class TaskList extends React.PureComponent<TaskListProps, TaskListState> 
         this.state = {
             verticalActive: "tab1"
         }
+        this.backHome = this.backHome.bind(this)
     }
 
     handleFillClick(value: string) {
         if (this.state.verticalActive === value) {
-            return
+            return 
         }
 
         this.setState({
             verticalActive: value
         })
     }
+
+    handleRender(value: string) {
+        if (value === "tab1") {
+            return  <MDBTabsPane show={this.state.verticalActive === 'tab1'}><TaskDefine {...this.props} auth={this.props.auth} colorBorder="dark" textColor="text-white"/></MDBTabsPane>
+        }
+
+        if (value === "tab2") {
+            return  <MDBTabsPane show={this.state.verticalActive === 'tab2'}><TaskInprocess {...this.props} auth={this.props.auth} colorBorder="dark" textColor="text-white"/></MDBTabsPane>
+        }
+        if (value === "tab3") {
+            return  <MDBTabsPane show={this.state.verticalActive === 'tab3'}><TaskDone {...this.props} auth={this.props.auth} colorBorder="dark" textColor="text-white"/></MDBTabsPane>
+        }
+    }
+    
+    backHome() {
+      this.props.history.push("/")
+    }
+
 
     render() {
         return (
@@ -59,9 +80,7 @@ export class TaskList extends React.PureComponent<TaskListProps, TaskListState> 
                 </MDBTabs>
 
                 <MDBTabsContent>
-                    <MDBTabsPane show={this.state.verticalActive === 'tab1'}><TaskDefine history={this.props.history} auth={this.props.auth} colorBorder="dark" textColor="text-white"/></MDBTabsPane>
-                    <MDBTabsPane show={this.state.verticalActive === 'tab2'}><TaskInprocess  history={this.props.history} auth={this.props.auth} colorBorder="dark" textColor="text-white"/></MDBTabsPane>
-                    <MDBTabsPane show={this.state.verticalActive === 'tab3'}><TaskDone history={this.props.history} auth={this.props.auth} colorBorder="dark" textColor="text-white"/></MDBTabsPane>
+                    {this.handleRender(this.state.verticalActive)}
                 </MDBTabsContent>
             </>
         )
