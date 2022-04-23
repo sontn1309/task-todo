@@ -11,13 +11,10 @@ import {
     MDBModalBody,
     MDBModalFooter,
     MDBBadge,
-    MDBInput,
-    MDBTextArea,
-    MDBInputGroup
 
 } from 'mdb-react-ui-kit';
 import Swal from 'sweetalert2'
-import { getTasks, deleteTask, updateStatus } from '../../api/tasks-api'
+import { getTasks, deleteTask, updateStatus , saveTask} from '../../api/tasks-api'
 import Auth from '../../auth/Auth'
 import { TaskModel } from '../../types/Task'
 import { History } from 'history'
@@ -40,6 +37,10 @@ export interface TaskState {
     basicModal: Boolean
     tasks: TaskModel[]
     loadingTodos: Boolean
+    taskId : string
+    title : string
+    description : string
+    titleModal : string
 }
 
 export class TaskDefine extends React.PureComponent<TaskProps, TaskState> {
@@ -48,10 +49,24 @@ export class TaskDefine extends React.PureComponent<TaskProps, TaskState> {
         this.state = {
             basicModal: false,
             tasks: [],
-            loadingTodos: true
+            loadingTodos: true,
+            taskId : '',
+            title : '',
+            description : '',
+            titleModal: 'Create task'
         }
         this.toggleShow = this.toggleShow.bind(this)
+        this.handleTitleChange = this.handleTitleChange.bind(this)
+        this.handleDescriptionChange = this.handleDescriptionChange.bind(this)
     }
+
+handleTitleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    this.setState({ title: event.target.value })
+  }
+
+handleDescriptionChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
+    this.setState({ description: event.target.value })
+  }
 
     backHome = () => {
         this.props.history.push(`/`)
@@ -73,6 +88,49 @@ export class TaskDefine extends React.PureComponent<TaskProps, TaskState> {
         }
     }
 
+    async updateTask() {
+        try {
+            
+            Swal.fire({
+                title: this.state.titleModal + ' ?',
+                showCancelButton: true,
+                confirmButtonText: 'Yes',
+            }).then(async (result) => {
+                if (result.isConfirmed) {
+                    Swal.fire({
+                        title: 'Updating...',
+                        timer: 2000,
+                        timerProgressBar: true,
+                        didOpen: async () => {
+                            Swal.showLoading()
+                            await saveTask(this.props.auth.getIdToken(), {
+                                taskId : this.state.taskId,
+                                title : this.state.title,
+                                description: this.state.description
+                            })
+                        },
+                        willClose: async () => {
+                            Swal.fire('Updated!', '', 'success')
+                            const item =  await getTasks(this.props.auth.getIdToken(), "define");
+                            this.setState({
+                                tasks: item,
+                                basicModal: false,
+                                taskId: '',
+                                title : '',
+                                description : ''
+                            })
+                        }
+                    })
+
+                }
+            })
+        } catch {
+            Swal.fire({
+                icon: 'error',
+                title: 'Update fail',
+            })
+        }
+    }
 
     async removeTask(taskId: string) {
         try {
@@ -146,18 +204,26 @@ export class TaskDefine extends React.PureComponent<TaskProps, TaskState> {
 
 
 
-    toggleShow() {
+    toggleShow(taskId :string, title: string, description :string, titleModal : string) {
         if (this.state.basicModal === true) {
             this.setState({
-                basicModal: false
+                basicModal: false,
+                taskId: '',
+                title : '',
+                description : '',
+                titleModal :titleModal
             })
         } else {
             this.setState({
-                basicModal: true
+                basicModal: true,
+                taskId: taskId,
+                title : title,
+                description : description,
+                titleModal :titleModal
             })
         }
     }
-
+    
 
 
     renderTasksBody() {
@@ -221,7 +287,7 @@ export class TaskDefine extends React.PureComponent<TaskProps, TaskState> {
                             </MDBCardBody>
                             <MDBCardFooter background='transparent' border={this.props.colorBorder} className="mx-auto">
                                 <Fragment>
-                                    <MDBBtn color="primary" className="mx-1" onClick={() => this.toggleShow()}>Edit</MDBBtn>
+                                    <MDBBtn color="primary" className="mx-1" onClick={() =>  this.toggleShow(task.taskId, task.title, task.description, 'Edit task')}>Edit</MDBBtn>
                                     <MDBBtn color="secondary" className="mx-1" onClick={() => this.updateStatus(task.taskId, "inprocess")}>Inprocess</MDBBtn>
                                     <MDBBtn color="success" className="mx-1" onClick={() => this.updateStatus(task.taskId, "done")}>Done</MDBBtn>
                                 </Fragment>
@@ -231,8 +297,6 @@ export class TaskDefine extends React.PureComponent<TaskProps, TaskState> {
                 })
                 }
             </>
-
-
         )
     }
 
@@ -248,35 +312,36 @@ export class TaskDefine extends React.PureComponent<TaskProps, TaskState> {
                                 icon
                                 color="green"
                                 className="p-5 m-4"
-                                onClick={() => this.toggleShow()}
+                                onClick={() =>  this.toggleShow('', '', '', 'Create task')}
                             >
                                 <Icon name="add" />
                             </Button>
                         </MDBCardText>
                     </MDBCol>
                 </MDBRow>
-                <MDBModal show={this.state.basicModal} setShow={this.state.basicModal} tabIndex='-1'>
+                <MDBModal show={this.state.basicModal} setShow={this.state.basicModal} tabIndex='-1' staticBackdrop='true'>
                     <MDBModalDialog>
                         <MDBModalContent>
                             <MDBModalHeader>
-                                <MDBModalTitle><div>
+                                <MDBModalTitle className='me-auto'>
+                                    <div>
                                     <h4>
-
+                                       
                                         <MDBBadge className="mr-4" color='dark'>{new Date().toLocaleString()}</MDBBadge>
+                                        <b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{this.state.titleModal}</b>
                                     </h4>
                                 </div>
                                 </MDBModalTitle>
                             </MDBModalHeader>
                             <MDBModalBody >
-                                <input className='form-control mb-3' type='text' placeholder='Title of the task' />
-
-                                <textarea className='form-control' rows={5} cols={33} placeholder='Description of the task' />
+                            <input onChange={this.handleTitleChange} value={this.state.title} className='form-control mb-3' type='text' placeholder='Title of the task' />
+                                <textarea  onChange={this.handleDescriptionChange} value={this.state.description} className='form-control' rows={5} cols={33} placeholder='Description of the task' />
                             </MDBModalBody>
                             <MDBModalFooter>
                                 <MDBBtn color='secondary' onClick={this.toggleShow}>
                                     Close
                                 </MDBBtn>
-                                <MDBBtn>Save changes</MDBBtn>
+                                <MDBBtn onClick={() => this.updateTask()}>Save changes</MDBBtn>
                             </MDBModalFooter>
                         </MDBModalContent>
                     </MDBModalDialog>
