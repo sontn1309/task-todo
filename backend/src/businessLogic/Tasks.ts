@@ -1,6 +1,6 @@
 import { v4 as uuidv4 } from 'uuid';
 import 'source-map-support/register'
-import { TodosAccess } from '../dataLayer/TodosAccess'
+import { TaskService } from '../dataLayer/TaskService'
 import { TaskModel } from '../models/Task'
 import { SaveTaskRequest } from '../requests/SaveTaskRequest'
 import { APIGatewayProxyEvent } from 'aws-lambda'
@@ -8,15 +8,15 @@ import { getUserId } from '../lambda/utils';
 import { createLogger } from '../utils/logger'
 const logger = createLogger('Task Magnage')
 
-const todosAccess = new TodosAccess()
+const taskService = new TaskService()
 
 export async function getTasks(userId: string): Promise<TaskModel[]> {
-  return await todosAccess.getTaskItems(userId)
+  return await taskService.getTaskItems(userId)
 }
 
 export async function getTasksForUser(event: APIGatewayProxyEvent): Promise<TaskModel[]> {
   const userId = getUserId(event);
-  return await todosAccess.getTaskItems(userId)
+  return await taskService.getTaskItems(userId)
 }
 
 export async function saveTask(userId: string, saveTaskRequest: SaveTaskRequest): Promise<TaskModel> {
@@ -33,37 +33,37 @@ export async function saveTask(userId: string, saveTaskRequest: SaveTaskRequest)
     status : "define",
     description: saveTaskRequest.description
   }
-  await todosAccess.createTask(newItem)
+  await taskService.createTask(newItem)
 
   return newItem
 }
 
 async function updateTask(userId: string, taskId: string, saveTaskRequest: SaveTaskRequest) {
-  let item = await todosAccess.getTaskItem(taskId, userId)
+  let item = await taskService.getTaskItem(taskId, userId)
 
   if (!item)
     throw new Error('Item is not found')
     
-  await todosAccess.updateTaskItem(taskId, userId, saveTaskRequest as SaveTaskRequest)
+  await taskService.updateTaskItem(taskId, userId, saveTaskRequest as SaveTaskRequest)
   item.title =  saveTaskRequest.title;
   item.description =  saveTaskRequest.description;
   return item
 }
 
 export async function deleteTask(userId: string, taskId: string) {
-  const item = await todosAccess.getTaskItem(taskId, userId)
+  const item = await taskService.getTaskItem(taskId, userId)
 
   if (!item)
     throw new Error('Item is not found')
 
-  await todosAccess.deleteTaskItem(taskId, userId)
+  await taskService.deleteTaskItem(taskId, userId)
 }
 
 export async function updateStatusTask(userId: string, taskId: string, status: string) {
-  const item = await todosAccess.getTaskItem(taskId, userId)
+  const item = await taskService.getTaskItem(taskId, userId)
 
   if (!item)
     throw new Error('Item is not found')
     logger.info("item", item)
-  await todosAccess.updateStatus(taskId, userId, status)
+  await taskService.updateStatus(taskId, userId, status)
 }

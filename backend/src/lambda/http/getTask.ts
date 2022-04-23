@@ -6,7 +6,7 @@ import { createLogger } from '../../utils/logger'
 
 const logger = createLogger('GetTask')
 export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
-    logger.info('GetTask. Event', { event })
+    logger.info('Get tasks. Event', { event })
    
   const status = String(event.queryStringParameters.status);
   const result = await getTasksForUser(event);

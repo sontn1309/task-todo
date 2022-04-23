@@ -116,6 +116,7 @@ handleDescriptionChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
     }
     async updateTask() {
         try {
+            let error = null as any;
             Swal.fire({
                 title: 'Update task ?',
                 showCancelButton: true,
@@ -128,13 +129,25 @@ handleDescriptionChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
                         timerProgressBar: true,
                         didOpen: async () => {
                             Swal.showLoading()
-                            await saveTask(this.props.auth.getIdToken(), {
-                                taskId : this.state.taskId,
-                                title : this.state.title,
-                                description: this.state.description
-                            })
+                            try {
+                                await saveTask(this.props.auth.getIdToken(), {
+                                    taskId : this.state.taskId,
+                                    title : this.state.title,
+                                    description: this.state.description
+                                })} catch (e) {
+                                    error = e;
+                            }
                         },
                         willClose: async () => {
+                            if (error === null) {
+                                Swal.fire('Updated!', '', 'success')
+                            } else {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Update fail!',
+                                    text: error.message,
+                                })
+                            }
                             Swal.fire('Updated!', '', 'success')
                             const item =  await getTasks(this.props.auth.getIdToken(), "done");
                             this.setState({

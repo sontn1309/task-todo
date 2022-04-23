@@ -5,9 +5,9 @@ import { getUserId } from '../utils';
 import { saveTask } from '../../businessLogic/Tasks'
 import { createLogger } from '../../utils/logger'
 
-const logger = createLogger('Create task')
+const logger = createLogger('Save task')
 export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> =>{
-  logger.info('Create task. Event: ', { event })
+  logger.info('Save task. Event: ', { event })
    const newTodo: SaveTaskRequest = JSON.parse(event.body) as SaveTaskRequest
     const userId = getUserId(event)
     const item = await saveTask(userId, newTodo)

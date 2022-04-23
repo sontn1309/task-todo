@@ -90,7 +90,12 @@ handleDescriptionChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
 
     async updateTask() {
         try {
-            
+            let error = null as any;
+            const process = {
+                process: this.state.titleModal === 'Edit task' ? 'Updating...!' : 'Creating....!',
+                done: this.state.titleModal === 'Edit task' ? 'Updated!' : 'Created!',
+                fail: this.state.titleModal === 'Edit task' ? 'Update fail!' : 'Create fail!',
+            }
             Swal.fire({
                 title: this.state.titleModal + ' ?',
                 showCancelButton: true,
@@ -98,20 +103,32 @@ handleDescriptionChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
             }).then(async (result) => {
                 if (result.isConfirmed) {
                     Swal.fire({
-                        title: 'Updating...',
+                        title: process.process,
                         timer: 2000,
                         timerProgressBar: true,
                         didOpen: async () => {
                             Swal.showLoading()
+                            try {
                             await saveTask(this.props.auth.getIdToken(), {
                                 taskId : this.state.taskId,
                                 title : this.state.title,
                                 description: this.state.description
-                            })
+                            })} catch (e) {
+                                error = e;
+                            }
                         },
                         willClose: async () => {
-                            Swal.fire('Updated!', '', 'success')
+                            if (error === null) {
+                                Swal.fire(process.done, '', 'success')
+                            } else {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: process.fail,
+                                    text: error.message,
+                                })
+                            }
                             const item =  await getTasks(this.props.auth.getIdToken(), "define");
+                       
                             this.setState({
                                 tasks: item,
                                 basicModal: false,

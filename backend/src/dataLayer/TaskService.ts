@@ -15,7 +15,7 @@ const XAWS = AWSXRay.captureAWS(AWS)
 
 const logger = createLogger('Task Magnage')
 
-export class TodosAccess {
+export class TaskService {
   constructor(
     private readonly docClient: DocumentClient = new XAWS.DynamoDB.DocumentClient(),
     private readonly taskTable = process.env.TASK_TABLE,
