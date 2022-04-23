@@ -1,0 +1,23 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "createTask",
+  "type": "object",
+  "properties": {
+    "title": {
+      "type": "string",
+      "pattern": "^(?!\\s*$).+"
+    },
+    "taskId": {
+      "type": "string"
+    },
+    "description": {
+      "type": "string",
+      "pattern": "^(?!\\s*$).+"
+    }
+  },
+  "required": [
+    "title",
+    "description"
+  ],
+  "additionalProperties": false
+}

@@ -1,0 +1,159 @@
+service: serverles-manager-task
+
+plugins:
+  - serverless-webpack
+  - serverless-iam-roles-per-function
+  - serverless-plugin-tracing
+  - serverless-reqvalidator-plugin
+  - serverless-aws-documentation
+provider:
+  name: aws
+  runtime: nodejs12.x
+  stage: ${opt:stage, 'dev'}
+  region: ${opt:region, 'us-west-2'}
+
+  tracing:
+    lambda: true
+    apiGateway: true
+  environment:
+    TASK_TABLE: Manage-task-${self:provider.stage}
+    TASK_INDEX: TaskIndex
+custom:
+  documentation:
+    api:
+      info:
+        version: v1.0.0
+        title: Udagram API
+        description: Serverless
+    models:
+      - name: SaveTaskRequest
+        contentType: application/json
+        schema: ${file(models/create-task-model.json)}
+  logs:
+    restApi: true
+functions:
+
+  Auth:
+    handler: src/lambda/auth/auth0Authorizer.handler
+  GetTask:
+    handler: src/lambda/http/getTask.handler
+    events:
+      - http:
+          method: get
+          path: tasks
+          cors: true
+          authorizer: Auth
+          reqValidatorName: RequestBodyValidator
+          request:
+            parameters:
+              querystrings:
+                status: true
+    iamRoleStatements:
+      - Effect: Allow
+        Action:
+          - dynamodb:Query
+          - dynamodb:Scan
+        Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.TASK_TABLE}/index/${self:provider.environment.TASK_INDEX}
+  UpdateStatus:
+    handler: src/lambda/http/updateStatusTask.handler
+    events:
+      - http:
+          method: patch
+          path: tasks/{taskId}
+          cors: true
+          authorizer: Auth
+          reqValidatorName: RequestBodyValidator
+          request:
+            parameters:
+              querystrings:
+                status: true
+    iamRoleStatements:
+      - Effect: Allow
+        Action:
+          - dynamodb:Query
+          - dynamodb:UpdateItem
+          - dynamodb:GetItem
+        Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.TASK_TABLE}
+  SaveTask:
+    handler: src/lambda/http/saveTask.handler
+    events:
+      - http:
+          method: post
+          path: tasks
+          cors: true
+          authorizer: Auth
+          reqValidatorName: RequestBodyValidator
+          documentation:
+            summary: Save task
+            description: save task
+            requestModels:
+              application/json: SaveTaskRequest
+    iamRoleStatements:
+      - Effect: Allow
+        Action:
+          - dynamodb:Query
+          - dynamodb:UpdateItem
+          - dynamodb:GetItem
+          - dynamodb:PutItem
+        Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.TASK_TABLE}
+  DeleteTodo:
+    handler: src/lambda/http/deleteTask.handler
+    events:
+      - http:
+          method: delete
+          path: tasks/{taskId}
+          cors: true
+          authorizer: Auth
+    iamRoleStatements:
+      - Effect: Allow
+        Action:
+          - dynamodb:Query
+          - dynamodb:DeleteItem
+          - dynamodb:GetItem
+        Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.TASK_TABLE}
+resources:
+  Resources:
+    GatewayResponseDefault4XX:
+      Type: AWS::ApiGateway::GatewayResponse
+      Properties:
+        ResponseParameters:
+          gatewayresponse.header.Access-Control-Allow-Origin: "'*'"
+          gatewayresponse.header.Access-Control-Allow-Headers: "'*'"
+          gatewayresponse.header.Access-Control-Allow-Methods: "'GET,OPTIONS,POST,DELETE,PUT,PATCH'"
+        ResponseType: DEFAULT_4XX
+        RestApiId:
+          Ref: ApiGatewayRestApi  
+    TaskTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        AttributeDefinitions:
+          - AttributeName: taskId
+            AttributeType: S
+          - AttributeName: userId
+            AttributeType: S
+          - AttributeName: status
+            AttributeType: S
+        KeySchema:
+          - AttributeName: userId
+            KeyType: HASH
+          - AttributeName: taskId
+            KeyType: RANGE
+        BillingMode: PAY_PER_REQUEST
+        TableName: ${self:provider.environment.TASK_TABLE}
+        GlobalSecondaryIndexes:
+          - IndexName: ${self:provider.environment.TASK_INDEX}
+            KeySchema:
+              - AttributeName: userId
+                KeyType: HASH
+              - AttributeName: status
+                KeyType: RANGE
+            Projection:
+              ProjectionType: ALL
+    RequestBodyValidator:
+      Type: AWS::ApiGateway::RequestValidator
+      Properties:
+        Name: 'request-body-validator'
+        RestApiId:
+          Ref: ApiGatewayRestApi
+        ValidateRequestBody: true
+        ValidateRequestParameters: true
